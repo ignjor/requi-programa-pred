@@ -5,6 +5,10 @@ import ImagenesTerr from "./imagenesterr.jsx";
 
 const Programa = () => {
     const [horaActual, setHoraActual] = useState('');
+    const [numeroFechaActual, setNumeroFechaActual] = useState(null);
+    const [predicacionHoy, setPredicacionHoy] = useState(null);
+
+
     const [cargando, setCargando] = useState(true);
     const [scrolled, setScrolled] = useState(false);
     const tablaRef = useRef(null);
@@ -12,29 +16,52 @@ const Programa = () => {
 
     const [imagenterr, setImagenesterr] = useState(null);
     const imagenDelTerr = {
-      "T:17 VILLA EL SOL.": "/img/17.png",
-      "T:46 LAS ROSAS PARTE B.": "/img/46.png",
-      "T:37 LA CRUZ PARTE A." : "/img/37.png",
-      "T:30 EL ESFUERZO PARTE B." : "/img/30.png",
-      "T:58 SAN RAFAEL" : "/img/58.png",
-      "T:3 EL VATICANO PARTE B." : "/img/3.png",
-      "T:14 CHUMACO." : "/img/14.png",
-      "T:49 LECAROS." : "/img/49.png",
-      "T:51 VILLA EL ABRA." : "/img/51.png",
-      "T:35 LOS PERALES PARTE B." : "/img/35.png",
-      "T:57 BELLAVISTA" : "/img/57.png",
-      "T:22 CENTRO C (SHELL)." : "/img/22.png",
-      "T:11 LOS CRISTALES" : "/img/11.png",
+      "T:17 VILLA EL SOL.": "/requi-programa-pred/img/17.png",
+      "T:46 LAS ROSAS PARTE B.": "/requi-programa-pred/img/46.png",
+      "T:37 LA CRUZ PARTE A." : "/requi-programa-pred/img/37.png",
+      "T:30 EL ESFUERZO PARTE B." : "/requi-programa-pred/img/30.png",
+      "T:58 SAN RAFAEL" : "/requi-programa-pred/img/58.png",
+      "T:3 EL VATICANO PARTE B." : "/requi-programa-pred/img/3.png",
+      "T:14 CHUMACO." : "/requi-programa-pred/img/14.png",
+      "T:49 LECAROS." : "/requi-programa-pred/img/49.png",
+      "T:51 VILLA EL ABRA." : "/requi-programa-pred/img/51.png",
+      "T:35 LOS PERALES PARTE B." : "/requi-programa-pred/img/35.png",
+      "T:57 BELLAVISTA" : "/requi-programa-pred/img/57.png",
+      "T:22 CENTRO C (SHELL)." : "/requi-programa-pred/img/22.png",
+      "T:11 LOS CRISTALES" : "/requi-programa-pred/img/11.png",
 
     };
-    
+    //horaaaaaaaa
+    useEffect(() =>{
+      const obtenerHora = () => {
+        const fecha = new Date();
+        const hora = fecha.toLocaleDateString("es-CL", {timeZone: "America/Santiago", hour : "2-digit", minute: "2-digit", hour12: false});
+        setHoraActual(hora);
+
+        const dia = fecha.getDate();
+        setNumeroFechaActual(dia);
+
+        const hoy = programa.filter(item => item.fecha === dia);
+        setPredicacionHoy(hoy);
+
+        setCargando(false);
+      };
+
+      obtenerHora();
+      const intervalo = setInterval(obtenerHora, 60000);
+      return () => clearInterval(intervalo);
+    }, [])
+
+
+
+
 
     const handleClickTerritorio = (territorioTexto) => {
       const ruta = imagenDelTerr[territorioTexto];
       if (ruta) {
         setImagenesterr(ruta);
       } else {
-        console.warm ("No hay una imagen asignada para este territorio")
+        console.warn ("No hay una imagen asignada para este territorio")
       }
     };
 
@@ -129,45 +156,6 @@ const programa = [
   { dia: "Viernes", fecha: 15, hora: "10:00", lugar: "SALÓN DEL REINO: ARREGLO.", territorio: "T:4 - T:5", encargado: "CAMILO O." },
 ];
 
-    useEffect(() => {
-        const obtenerHora = async () => {
-            try {
-                const res = await fetch('https://worldtimeapi.org/api/timezone/America/Santiago');
-                const data = await res.json();
-                const fecha = new Date(data.datetime);
-                const hora = fecha.toLocaleTimeString('es-CL', {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: false, // Formato 24 horas mejorrr
-                });
-
-                setHoraActual(hora);
-
-                const dia = fecha.getDate(); //aqui guardamos la fecha del dia actual
-                setNumeroFechaActual(dia);
-
-                const hoy = programa.filter((item) => item.fecha === dia);
-                setPredicacionHoy(hoy);
-
-                setCargando(false);
-        
-
-
-            } catch (error) {
-                console.error("Error al obtener la hora:", error);
-                setHoraActual('Error al cargar la hora');
-                setCargando(false);
-            }
-        };
-        obtenerHora();
-        const intervalo = setInterval(obtenerHora, 60000); // Para actualizar cada minuto
-        return () => clearInterval(intervalo); // reiniciar el intervalo
-    }, []);
-
-    const [numeroFechaActual, setNumeroFechaActual] = useState(null);
-    const [predicacionHoy, setPredicacionHoy] = useState(null);
-
-
     const [buscar, setBuscar] = useState("");
 
     return (
@@ -184,7 +172,7 @@ const programa = [
           fontSize: "18px",
           fontWeight: "bold",
         }}>
-        Predicación - Requínoa, Chile | Hora actual: {horaActual}
+        Predicación - Requínoa, Chile | Fecha actual: {horaActual}
           </div>
 
           <div style={estilos.cuadrado}>
@@ -193,7 +181,7 @@ const programa = [
             {cargando ? (
                 <p style={{ textAlign: "center",fontFamily: "'Poppins', sans-serif" }}>Cargando...</p>
             ) : (
-                <p style={{ textAlign: "center",fontFamily: "'Poppins', sans-serif" }}>Hora actual en Requínoa: {horaActual}</p>
+                <p style={{ textAlign: "center",fontFamily: "'Poppins', sans-serif" }}>Fecha actual en Requínoa: {horaActual}</p>
             )}
           </div>
 
